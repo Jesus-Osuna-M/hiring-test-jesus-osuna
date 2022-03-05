@@ -2,6 +2,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -64,14 +65,14 @@ public class Echo {
         }
     }
 
-    static void connect(String url,String msg,String method) throws Exception{
-        log = Logger.getLogger("com.variacode.echo");
-        log.setLevel(Level.ALL);
+    static int connect(String url,String msg,String method) throws InterruptedException, ExecutionException{
+        log = Logger.getLogger("echo");
+
         HttpRequest requestSelected = null;
 
-        switch (method){
+        switch (method.toUpperCase()){
             case POST:
-                System.out.println(MSG_METHOD+POST+URL+url);
+                log.log(Level.INFO,MSG_METHOD+POST+URL+url);
                 requestSelected = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header(CONTENT,VALUE)
@@ -80,7 +81,7 @@ public class Echo {
                 break;
 
             case GET:
-                System.out.println(MSG_METHOD+GET+URL+url);
+                log.log(Level.INFO,MSG_METHOD+GET+URL+url);
                 requestSelected = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header(CONTENT, VALUE)
@@ -89,7 +90,7 @@ public class Echo {
                 break;
 
             case PUT:
-                System.out.println(MSG_METHOD+PUT+URL+url);
+                log.log(Level.INFO,MSG_METHOD+PUT+URL+url);
                 requestSelected = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header(CONTENT, VALUE)
@@ -98,7 +99,7 @@ public class Echo {
                 break;
 
             case DELETE:
-                System.out.println(MSG_METHOD+DELETE+URL+url);
+                log.log(Level.INFO,MSG_METHOD+DELETE+URL+url);
                 requestSelected = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header(CONTENT, VALUE)
@@ -107,47 +108,47 @@ public class Echo {
                 break;
 
             default:
-                System.out.println("You can only test, POST, GET, PUT, DELETE methods");
+                log.log(Level.INFO,"You can only test, POST, GET, PUT, DELETE methods");
                 break;
         }
 
+        HttpResponse<String> stringHttpResponse = getStringHttpResponse(requestSelected);
+        return stringHttpResponse.statusCode();
+    }
+
+    private static HttpResponse<String> getStringHttpResponse(HttpRequest requestSelected) throws InterruptedException, ExecutionException {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         var client = HttpClient.newBuilder().executor(executor).build();
-
         var responseFuture = client.sendAsync(requestSelected, HttpResponse.BodyHandlers.ofString());
-        responseFuture.thenApply(res -> {
-            //log.info("StatusCode: "+ res.statusCode());
-            System.out.println("Status code : "+res.statusCode());
-            System.out.print("Meaning : ");
-            switch (res.statusCode()){
-                case 100:
-                    System.out.println("The server is thinking through the request.");
-                    break;
+        HttpResponse<String> stringHttpResponse = responseFuture.thenApply(res -> {
 
-                case 200:
-                    System.out.println("Success! The request was successfully completed and the server gave the browser the expected response.");
-                    break;
+            log.log(Level.INFO,"Status code : " + res.statusCode());
+                    switch (res.statusCode()) {
+                        case 100:
+                            log.log(Level.INFO,"The server is thinking through the request.");
+                            break;
 
-                case 404:
-                    System.out.println("Page not found. The site or page couldn't be reached.");
-                    break;
+                        case 200:
+                            log.log(Level.INFO,"Success! The request was successfully completed and the server gave the browser the expected response.");
+                            break;
 
-                case 500:
-                    System.out.println("Failure. A valid request was made by the client but the server failed to complete the request.");
-                    break;
+                        case 404:
+                            log.log(Level.INFO,"Page not found. The site or page couldn't be reached.");
+                            break;
 
-                default:
-                    System.out.println("Something unexpected went wrong. Try again.");
-                    break;
-            }
-            return res;
+                        case 500:
+                            log.log(Level.INFO,"Failure. A valid request was made by the client but the server failed to complete the request.");
+                            break;
 
-        })
-                //.thenApply(HttpResponse::body)
-                //.thenAccept(log::info)
+                        default:
+                            log.log(Level.INFO,"Something unexpected went wrong. Try again.");
+                            break;
+                    }
+                    return res;
+                })
+
                 .get();
-        //log.info("test");
-
         executor.shutdownNow();
+        return stringHttpResponse;
     }
 }
