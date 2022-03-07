@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class EchoTest {
     @Test
     void executeValidEndpoint(){
-        /*Testing successful petition*/
         int testPostCode200= Echo.connect("https://postman-echo.com/post","testing post","POST");
         assertEquals(200,testPostCode200);
 
@@ -21,7 +20,6 @@ class EchoTest {
 
     @Test
     void executeInvalidEndpoint(){
-        /*Testing petition to a wrong url*/
         int testPostCode404= Echo.connect("https://postman-echo.com/INVALID_URL","testing post","POST");
         assertEquals(404,testPostCode404);
 
