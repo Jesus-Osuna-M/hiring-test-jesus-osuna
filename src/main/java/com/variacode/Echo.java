@@ -47,8 +47,8 @@ public class Echo {
         }
     }
 
-    private static boolean methodIsValid(final String url){
-        if(url.equalsIgnoreCase(POST)||url.equalsIgnoreCase(GET)||url.equalsIgnoreCase(PUT)||url.equalsIgnoreCase(DELETE)){
+    private static boolean methodIsValid(final String method){
+        if(method.equalsIgnoreCase(POST)||method.equalsIgnoreCase(GET)||method.equalsIgnoreCase(PUT)||method.equalsIgnoreCase(DELETE)){
             return true;
         }
         else{
@@ -150,7 +150,6 @@ public class Echo {
                         }
                         return res;
                 }).get();
-
         executor.shutdownNow();
         return stringHttpResponse.statusCode();
         } catch (InterruptedException e) {
