@@ -1,11 +1,10 @@
-import org.junit.jupiter.api.Assertions;
+package com.variacode;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class EchoTest {
     @Test
-    void connect() throws Exception{
+    void executeValidEndpoint(){
         /*Testing successful petition*/
         int testPostCode200= Echo.connect("https://postman-echo.com/post","testing post","POST");
         assertEquals(200,testPostCode200);
@@ -18,7 +17,10 @@ class EchoTest {
 
         int testDeleteCode200= Echo.connect("https://postman-echo.com/delete","testing get","DELETE");
         assertEquals(200,testDeleteCode200);
+    }
 
+    @Test
+    void executeInvalidEndpoint(){
         /*Testing petition to a wrong url*/
         int testPostCode404= Echo.connect("https://postman-echo.com/INVALID_URL","testing post","POST");
         assertEquals(404,testPostCode404);
@@ -26,7 +28,7 @@ class EchoTest {
         int testPutCode404= Echo.connect("https://postman-echo.com/INVALID_URL","testing put","PUT");
         assertEquals(404,testPutCode404);
 
-        int testGetCode404= Echo.connect("https://postman-echo.com/INVALID_URLt","testing get","GET");
+        int testGetCode404= Echo.connect("https://postman-echo.com/INVALID_URL","testing get","GET");
         assertEquals(404,testGetCode404);
 
         int testDeleteCode404= Echo.connect("https://postman-echo.com/INVALID_URL","testing get","DELETE");
